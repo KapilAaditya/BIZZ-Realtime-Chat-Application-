@@ -12,7 +12,6 @@ const { connectDB } = require("./lib/db");
 const job = require("./lib/cron");
 
 const clerkWebhook = require("./webhooks/cleak.webhooks");
-const authRoutes = require("./routes/auth.route");
 
 const PORT = process.env.PORT;
 const FRONTEND_URL = process.env.FRONTEND_URL;
@@ -30,8 +29,6 @@ app.get("/health", (req, res) => {
   res.status(200).json({ ok: true });
 });
 
-app.use("/api/auth", authRoutes);
-app.use("/api/messages", messageRoutes);
 
 // Serves the client-side SPA production build
 if (fs.existsSync(publicDir)) {
