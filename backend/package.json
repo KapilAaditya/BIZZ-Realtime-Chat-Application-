@@ -12,7 +12,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "module",
+  "type": "commonjs",
   "dependencies": {
     "@clerk/express": "^2.1.23",
     "@imagekit/nodejs": "^7.7.0",
