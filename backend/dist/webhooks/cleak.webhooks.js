@@ -1,6 +1,6 @@
 require("dotenv").config()
 const express = require("express");
-const User = require("../model/user.js"); // Removed .js extension for standard CJS
+const User = require("../model/user"); // Removed .js extension for standard CJS
 const { verifyWebhook } = require("@clerk/backend/webhooks");
 
 const router = express.Router();

@@ -7,7 +7,7 @@ const path = require("path");
 
 const { clerkMiddleware } = require("@clerk/express");
 
-const User = require("./models/user.model");
+const User = require("./model/user");
 const { connectDB } = require("./lib/db");
 const job = require("./lib/cron");
 
