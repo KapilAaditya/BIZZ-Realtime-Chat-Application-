@@ -40,9 +40,16 @@ if (fs.existsSync(publicDir)) {
   });
 }
 
-app.listen(PORT, () => {
-  connectDB();
-  console.log("Server is up and running on PORT:", PORT);
+connectDB()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
 
-  if (process.env.NODE_ENV === "production") job.start();
-});
+    if (process.env.NODE_ENV === "production") {
+      Job.start();
+    }
+  })
+  .catch((err) => {
+    console.error(err);
+  });
