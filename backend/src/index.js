@@ -9,7 +9,7 @@ const { clerkMiddleware } = require("@clerk/express");
 
 const User = require("./model/user");
 const { connectDB } = require("./lib/db");
-const job = require("./lib/cron");
+const Job = require("./lib/cron");
 
 const clerkWebhook = require("./webhooks/cleak.webhooks");
 
@@ -36,8 +36,10 @@ if (fs.existsSync(publicDir)) {
 
   // Fix: Corrected the catch-all routing syntax from '/{*any}' to '*'
   //  This syntax is perfectly valid for modern wildcards
-app.get("/{*any}", (req, res, next) => {
-    res.sendFile(path.join(publicDir, "index.html"), (err) => next(err));
+app.get("/:any*", (req, res, next) => {
+    res.sendFile(path.join(publicDir, "index.html"), (err) => {
+      if (err) next(err);
+    });
   });
 }
 

@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-require("dotenv/config");
+require("dotenv/config"); 
 
 const fs = require("fs");
 const path = require("path");
@@ -9,7 +9,7 @@ const { clerkMiddleware } = require("@clerk/express");
 
 const User = require("./model/user");
 const { connectDB } = require("./lib/db");
-const job = require("./lib/cron");
+const Job = require("./lib/cron");
 
 const clerkWebhook = require("./webhooks/cleak.webhooks");
 
@@ -18,7 +18,7 @@ const FRONTEND_URL = process.env.FRONTEND_URL;
 
 const publicDir = path.join(process.cwd(), "public");
 
-const app = express();
+const app = express(); 
 
 // Crucial: The webhook route uses express.raw BEFORE any global express.json() parsers run
 app.use("/api/webhooks/clerk", express.raw({ type: "application/json" }), clerkWebhook);
@@ -34,11 +34,15 @@ app.get("/health", (req, res) => {
 if (fs.existsSync(publicDir)) {
   app.use(express.static(publicDir));
 
+  // Fix: Corrected the catch-all routing syntax from '/{*any}' to '*'
   //  This syntax is perfectly valid for modern wildcards
- app.get("/{*any}", (req, res, next) => {
-    res.sendFile(path.join(publicDir, "index.html"), (err) => next(err));
+app.get("/:any*", (req, res, next) => {
+    res.sendFile(path.join(publicDir, "index.html"), (err) => {
+      if (err) next(err);
+    });
   });
 }
+
 
 connectDB()
   .then(() => {
