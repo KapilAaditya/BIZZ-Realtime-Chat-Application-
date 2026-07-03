@@ -3,8 +3,7 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.jsx";
 import { ClerkProvider } from "@clerk/react";
-import { BrowserRouter } from "react-router";
-
+import { BrowserRouter } from 'react-router-dom'; //  CORRECT
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <ClerkProvider>
