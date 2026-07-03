@@ -34,26 +34,14 @@ app.get("/health", (req, res) => {
 if (fs.existsSync(publicDir)) {
   app.use(express.static(publicDir));
 
-  // Fix: Corrected the catch-all routing syntax from '/{*any}' to '*'
-  //  This syntax is perfectly valid for modern wildcards
-app.get("/:any*", (req, res, next) => {
-    res.sendFile(path.join(publicDir, "index.html"), (err) => {
-      if (err) next(err);
-    });
+  app.get("/{*any}", (req, res, next) => {
+    res.sendFile(path.join(publicDir, "index.html"), (err) => next(err));
   });
 }
 
+server.listen(PORT, () => {
+  connectDB();
+  console.log("Server is up and running on PORT:", PORT);
 
-connectDB()
-  .then(() => {
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-    });
-
-    if (process.env.NODE_ENV === "production") {
-      Job.start();
-    }
-  })
-  .catch((err) => {
-    console.error(err);
-  });
+  if (process.env.NODE_ENV === "production") job.start();
+});
