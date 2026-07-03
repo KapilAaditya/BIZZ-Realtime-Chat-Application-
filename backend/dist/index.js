@@ -35,10 +35,8 @@ if (fs.existsSync(publicDir)) {
   app.use(express.static(publicDir));
 
   //  This syntax is perfectly valid for modern wildcards
-  app.get("(.*)", (req, res, next) => {
-    res.sendFile(path.join(publicDir, "index.html"), (err) => {
-      if (err) next(err);
-    });
+ app.get("/{*any}", (req, res, next) => {
+    res.sendFile(path.join(publicDir, "index.html"), (err) => next(err));
   });
 }
 
