@@ -1,64 +1,35 @@
-const express = require("express");
-const cors = require("cors");
-require("dotenv/config"); 
-
-const fs = require("fs");
-const path = require("path");
-
-const { clerkMiddleware } = require("@clerk/express");
-
-const User = require("./model/user");
-const { connectDB } = require("./lib/db");
-const Job = require("./lib/cron");
-
-const clerkWebhook = require("./webhooks/cleak.webhooks");
-
-const PORT = process.env.PORT || 5000; // Added fallback port
-const FRONTEND_URL = process.env.FRONTEND_URL;
-
-const publicDir = path.join(process.cwd(), "public");
-
-const app = express(); 
-const mongoose = require('mongoose');
-
-// function connectDB() {
-//     return new Promise((resolve, reject) => {
-//         mongoose.connect(process.env.MONGO_URI)
-//             .then(() => {
-//                 console.log('MongoDB Connected successfully 🚀');
-//                 resolve();
-//             })
-//             .catch((err) => {
-//                 console.error('MongoDB connection error ❌:', err.message);
-//                 reject(err);
-//             });
-//     });
-// }
-
- 
-
-// Crucial: The webhook route uses express.raw BEFORE any global express.json() parsers run
-app.use("/api/webhooks/clerk", express.raw({ type: "application/json" }), clerkWebhook);
-
+require('dotenv').config();
+const express = require('express');
+const connectDB = require('./lib/db'); 
+const {clerkMiddleware } = require('@clerk/express')
+const cors = require('cors')
+const fs = require('fs')
+const path = require('path')
+const app = express();
+const PORT = process.env.PORT || 5000;
+const FRONTEND_URL = process.env.FRONTEND_URL
+const publicDir = path.join(process.cwd(),"public") // it says join the current working directory and find the public folder 
 app.use(express.json());
-app.use(cors({ origin: FRONTEND_URL, credentials: true }));
-app.use(clerkMiddleware());
+app.use(clerkMiddleware())
+app.use(cors({origin:FRONTEND_URL , credentials:true}))
 
-app.get("/health", (req, res) => {
-  res.status(200).json({ ok: true });
+app.get('/health' , (req,res)=>{
+    res.status(200).json({msg : " OK IT IS WORKING "})
+})
+// if the pubic directory exist , serve the static file 
+if(fs.existsSync(publicDir)){
+    app.use(express.static(publicDir))
+
+
+   app.use((req, res, next) => {
+    res.sendFile(path.join(publicDir, "index.html"), (err) => {
+        if (err) next(err);
+    });
 });
-
-if (fs.existsSync(publicDir)) {
-  app.use(express.static(publicDir));
-
-  app.get("/{*any}", (req, res, next) => {
-    res.sendFile(path.join(publicDir, "index.html"), (err) => next(err));
-  });
 }
 
-app.listen(PORT, () => {
-  connectDB();
-  console.log("Server is up and running on PORT:", PORT);
-
-  if (process.env.NODE_ENV === "production") Job.start();
+connectDB().then(() => {
+    app.listen(PORT, () => {
+        console.log(`The app is listening on http://localhost:${PORT}`);
+    });
 });
