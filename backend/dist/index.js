@@ -8,7 +8,7 @@ const path = require("path");
 const { clerkMiddleware } = require("@clerk/express");
 
 const User = require("./model/user");
-// const { connectDB } = require("./lib/db");
+const { connectDB } = require("./lib/db");
 const Job = require("./lib/cron");
 
 const clerkWebhook = require("./webhooks/cleak.webhooks");
@@ -21,19 +21,21 @@ const publicDir = path.join(process.cwd(), "public");
 const app = express(); 
 const mongoose = require('mongoose');
 
-function connectDB() {
-    return new Promise((resolve, reject) => {
-        mongoose.connect(process.env.MONGO_URI)
-            .then(() => {
-                console.log('MongoDB Connected successfully 🚀');
-                resolve();
-            })
-            .catch((err) => {
-                console.error('MongoDB connection error ❌:', err.message);
-                reject(err);
-            });
-    });
-}
+// function connectDB() {
+//     return new Promise((resolve, reject) => {
+//         mongoose.connect(process.env.MONGO_URI)
+//             .then(() => {
+//                 console.log('MongoDB Connected successfully 🚀');
+//                 resolve();
+//             })
+//             .catch((err) => {
+//                 console.error('MongoDB connection error ❌:', err.message);
+//                 reject(err);
+//             });
+//     });
+// }
+
+ 
 
 // Crucial: The webhook route uses express.raw BEFORE any global express.json() parsers run
 app.use("/api/webhooks/clerk", express.raw({ type: "application/json" }), clerkWebhook);
@@ -58,5 +60,5 @@ app.listen(PORT, () => {
   connectDB();
   console.log("Server is up and running on PORT:", PORT);
 
-  if (process.env.NODE_ENV === "production") ob.start();
+  if (process.env.NODE_ENV === "production") Job.start();
 });
