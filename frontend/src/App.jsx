@@ -1,19 +1,21 @@
 import './App.css'
-import { Show, SignInButton, SignUpButton, UserButton } from '@clerk/react'
-
+// 1. Import the correct control components from Clerk
+import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from '@clerk/react'
 
 function App() {
-
   return (
     <>
       <header>
-        <Show when="signed-out">
+        {/* 2. Rendered only when the user is completely logged out */}
+        <SignedOut>
           <SignInButton mode='modal' />
           <SignUpButton mode='modal' />
-        </Show>
-        <Show when="signed-in">
+        </SignedOut>
+
+        {/* 3. Rendered only when the user is completely logged in */}
+        <SignedIn>
           <UserButton />
-        </Show>
+        </SignedIn>
       </header>
     </>
   )
