@@ -6,26 +6,31 @@ const { verifyWebhook } = require("@clerk/backend/webhooks");
 const router = express.Router();
 
 router.post("/", async (req, res) => {
+  console.log("=== WEBHOOK HIT ===");
   try {
     const signingSecret = process.env.CLERK_WEBHOOK_SIGNING_SECRET;
     if (!signingSecret) {
+      console.error("❌ Error: Missing signing secret environment variable");
       res.status(503).json({ message: "Webhook secret is not provided" });
       return;
     }
 
-    // clerk's verifier expects a Web Request with the raw body; express.raw gives a Buffer.
     const payload = Buffer.isBuffer(req.body) ? req.body.toString("utf8") : String(req.body);
+    console.log("📦 Payload prepared length:", payload.length);
+
     const request = new Request("http://internal/webhooks/clerk", {
       method: "POST",
       headers: new Headers(req.headers),
       body: payload,
     });
 
-    // throws if the signature is wrong or the body was tampered with; only then do we trust evt.
+    console.log("🔑 Attempting verification...");
     const evt = await verifyWebhook(request, { signingSecret });
+    console.log("✅ Verification successful! Event Type:", evt.type);
 
     if (evt.type === "user.created" || evt.type === "user.updated") {
       const u = evt.data;
+      console.log("👤 Processing user data for Clerk ID:", u.id);
 
       const email =
         u.email_addresses?.find((e) => e.id === u.primary_email_address_id)?.email_address ??
@@ -34,20 +39,25 @@ router.post("/", async (req, res) => {
       const fullName =
         [u.first_name, u.last_name].filter(Boolean).join(" ") || u.username || email?.split("@")[0];
 
-      await User.findOneAndUpdate(
+      console.log("💾 Writing to MongoDB...");
+      const savedUser = await User.findOneAndUpdate(
         { clerkId: u.id },
         { clerkId: u.id, email, fullName, profilePic: u.image_url },
         { new: true, upsert: true, setDefaultsOnInsert: true },
       );
+      console.log("🎉 User successfully synced in DB:", savedUser._id);
     }
 
     if (evt.type === "user.deleted") {
-      if (evt.data.id) await User.findOneAndDelete({ clerkId: evt.data.id });
+      if (evt.data.id) {
+        await User.findOneAndDelete({ clerkId: evt.data.id });
+        console.log("🗑️ User deleted from DB:", evt.data.id);
+      }
     }
 
     res.status(200).json({ received: true });
   } catch (error) {
-    console.error("Error in Clerk webhook:", error);
+    console.error("❌ CRITICAL ERROR IN WEBHOOK PROCCESSING:", error);
     res.status(400).json({ message: "Webhook verification failed" });
   }
 });
