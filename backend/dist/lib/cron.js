@@ -24,4 +24,4 @@ const job = new CronJob('*/14 * * * *', () => {
 
 })
 
-export default job
+module.exports = job
