@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
-const connectDB = require('./lib/db'); 
+const connectDB = require('./lib/db.js'); 
+const job = require('./lib/cron.js');
 const {clerkMiddleware } = require('@clerk/express')
 const cors = require('cors')
 const fs = require('fs')
@@ -9,6 +10,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const FRONTEND_URL = process.env.FRONTEND_URL
 const publicDir = path.join(process.cwd(),"public") // it says join the current working directory and find the public folder 
+app.use("/api/webhooks/clerk",express.raw({type: 'application/json'}), require("./webhooks/cleak.webhooks.js")); // Added route for Clerk webhooks
 app.use(express.json());
 app.use(clerkMiddleware())
 app.use(cors({origin:FRONTEND_URL , credentials:true}))
@@ -32,4 +34,8 @@ connectDB().then(() => {
     app.listen(PORT, () => {
         console.log(`The app is listening on http://localhost:${PORT}`);
     });
+     if(process.env.NODE_ENV === 'production'){
+        job.start();
+        console.log("Cron job started in production mode");
+    }
 });
