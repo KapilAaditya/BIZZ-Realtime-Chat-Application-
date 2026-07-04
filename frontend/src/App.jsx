@@ -1,21 +1,31 @@
 import './App.css'
-// 1. Import the correct control components from Clerk
-import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from '@clerk/react'
+// 1. Import useAuth instead of the missing components
+import { useAuth, SignInButton, SignUpButton, UserButton } from '@clerk/react'
 
 function App() {
+  // 2. Grab the current loading status and sign-in status
+  const { isLoaded, isSignedIn } = useAuth()
+
+  // 3. Prevent rendering or crashing while Clerk determines if the user is logged in
+  if (!isLoaded) {
+    return <div className="loading">Loading...</div>
+  }
+
   return (
     <>
       <header>
-        {/* 2. Rendered only when the user is completely logged out */}
-        <SignedOut>
-          <SignInButton mode='modal' />
-          <SignUpButton mode='modal' />
-        </SignedOut>
+        {/* 4. If NOT signed in, show the login/signup buttons */}
+        {!isSignedIn && (
+          <>
+            <SignInButton mode='modal' />
+            <SignUpButton mode='modal' />
+          </>
+        )}
 
-        {/* 3. Rendered only when the user is completely logged in */}
-        <SignedIn>
+        {/* 5. If fully signed in, show the User profile button */}
+        {isSignedIn && (
           <UserButton />
-        </SignedIn>
+        )}
       </header>
     </>
   )
