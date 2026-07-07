@@ -34,8 +34,8 @@ connectDB().then(() => {
     app.listen(PORT, () => {
         console.log(`The app is listening on http://localhost:${PORT}`);
     });
-     if(process.env.NODE_ENV === 'production'){
+     if(process.env.NODE_ENV === 'development'){
         job.start();
-        console.log("Cron job started in production mode");
+        console.log("Cron job started in development mode");
     }
 });
