@@ -18,6 +18,7 @@ app.use(cors({origin:FRONTEND_URL , credentials:true}))
 app.get('/health' , (req,res)=>{
     res.status(200).json({msg : " OK IT IS WORKING "})
 })
+app.use("api/auth", require("./routes/auth.js"))// Added route for authentication 
 // if the pubic directory exist , serve the static file 
 if(fs.existsSync(publicDir)){
     app.use(express.static(publicDir))
