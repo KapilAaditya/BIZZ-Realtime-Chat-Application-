@@ -102,7 +102,8 @@ router.post("/", async (req, res) => {
     if (req.headers['x-test-mode'] === 'true') {
       console.log("⚠️ Bypassing signature verification for Postman Test Mode!");
       // If Express parsed it before this or if it's sent raw, parse it out safely
-      evt = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+      const bodyString = Buffer.isBuffer(req.body) ? req.body.toString("utf8") : String(req.body);
+      evt = JSON.parse(bodyString);
     } else {
       console.log("🔑 Attempting secure verification...");
       evt = await verifyWebhook(request, { signingSecret });
