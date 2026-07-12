@@ -31,8 +31,8 @@ app.use("/api/message", require("./routes/message.js"));
 if (fs.existsSync(publicDir)) {
     app.use(express.static(publicDir));
 
-    // Catch-all route to serve Frontend index.html for Single Page Applications (SPA)
-    app.get("*", (req, res) => {
+    // ✅ FIXED: Named wildcard for Express v5 compatibility to serve SPA index.html
+    app.get("{*splat}", (req, res) => {
         res.sendFile(path.join(publicDir, "index.html"));
     });
 }
