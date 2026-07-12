@@ -1,20 +1,16 @@
-const express = require("express");
 const { getAuth } = require("@clerk/express");
-const router = express.Router();
 const User = require("../model/user.js");
 
 async function protectRoute(req, res, next) {
     try {
         const { userId } = getAuth(req);
         if (!userId) {
-            res.status(401).json({ message: "Unauthorized" });
-            return;
+            return res.status(401).json({ message: "Unauthorized" }); // Added return to prevent double responses
         }
         
         const user = await User.findOne({ clerkId: userId });
         if (!user) {
-            res.status(404).json({ msg: "User Profile is Not synced yet" });
-            return;
+            return res.status(404).json({ msg: "User Profile is Not synced yet" }); // Added return
         }
         
         req.user = user;
