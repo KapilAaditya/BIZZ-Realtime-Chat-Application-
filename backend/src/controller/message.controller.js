@@ -5,7 +5,7 @@ const { hasImageKitConfig, uploadChatMedia } = require('../lib/imagekit.js');
 async function getUsersForSidebar(req, res) {
     try {
         const loggedInUser = req.user._id;
-        const filterUser = await User.find({ _id: { $ne: loggedInUser } }).select("-clerkId");
+        const filterUser = await User.find({ _id: { $ne: loggedInUser } }).select("-clerkId");//$ne means not equal
         res.status(200).json(filterUser);
     } catch (error) {
         console.error("Error to getUsersForsidebar", error.message);
@@ -25,7 +25,7 @@ async function getConversationForSidebar(req, res) {
                 }
             }, 
             {
-                $sort: { lastMessageAt: -1 }
+                $sort: { lastMessageAt: -1 }  // new to old newest at top 
             },
             {
                 $lookup: { from: "users", localField: "_id", foreignField: "_id", as: "user" }
@@ -50,11 +50,11 @@ async function getMessages(req, res) {
         const myId = req.user._id;
 
         const messages = await Message.find({
-            $or: [
+            $or: [ // find atlest one ak mai se 
                 { senderId: myId, receiverId: userToChatId },
                 { senderId: userToChatId, receiverId: myId }
             ]
-        }).sort({ createdAt: 1 });
+        }).sort({ createdAt: 1 });// old to new latest at bottom 
 
         res.status(200).json(messages);
     } catch (error) {

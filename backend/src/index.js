@@ -6,8 +6,8 @@ const { clerkMiddleware } = require('@clerk/express');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
+const {app, server } = require('./lib/socket.js');
 
-const app = express();
 const PORT = process.env.PORT || 5000;
 const FRONTEND_URL = process.env.FRONTEND_URL;
 const publicDir = path.join(process.cwd(), "public");
@@ -39,7 +39,7 @@ if (fs.existsSync(publicDir)) {
 
 // 5. Database Connection & Server Boot
 connectDB().then(() => {
-    app.listen(PORT, () => {
+    server.listen(PORT, () => {
         console.log(`The app is listening on http://localhost:${PORT}`);
     });
     if (process.env.NODE_ENV === 'development') {
