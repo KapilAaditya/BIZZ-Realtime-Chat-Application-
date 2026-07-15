@@ -1,6 +1,7 @@
 const Message = require("../model/msg.js");
 const User = require("../model/user.js");
 const { hasImageKitConfig, uploadChatMedia } = require('../lib/imagekit.js');
+const { getReceiverSocketId, io } = require("../lib/socket.js");
 
 async function getUsersForSidebar(req, res) {
     try {
@@ -95,6 +96,11 @@ async function sendMessage(req, res) {
         });
         
         await newMessage.save();
+
+        const reciverSocketId= getReceiverSocketId(receiverId)
+        if(reciverSocketId){
+            io.to(reciverSocketId).emit("Your_New_MSG",newMessage)
+        }
         res.status(201).json(newMessage);
         
     } catch (error) {
