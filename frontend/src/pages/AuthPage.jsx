@@ -4,7 +4,6 @@ import { useWallpaper } from "../context/wallpaper.js"
 import { ShieldCheck, Sparkles, KeyRound } from "lucide-react" // Added layout decorative icons
 import AuthHeader from '../components/auth/authHeader.jsx'
 import { AuthHeroPanel } from '../components/auth/AuthHeroPanel.jsx'
-import AuthActionPanel from '../components/auth/AuthActionPanel.jsx'
 
 function AuthPage() {
   const [isSignUp, setIsSignUp] = useState(false)
@@ -118,8 +117,7 @@ function AuthPage() {
               </h3>
               <p className="text-xs text-slate-400 leading-relaxed mb-8 max-w-xs mx-auto">
                 Chat with confidence. All your conversations are encrypted and secure.
-                
-                              </p>
+              </p>
 
               <button
                 onClick={() => setShowClerk(true)}
