@@ -1,0 +1,83 @@
+@import "tailwindcss";
+@import "@heroui/styles"; 
+@import "./styles/heroui.theme-presets.css";
+@layer utilities {
+  .bizz-loader {
+    display: inline-block;
+    font-family: monospace; /* Monospace guarantees perfect character layout bounds */
+    overflow: hidden;
+    white-space: nowrap;
+    border-right: 3px solid currentColor; /* Typing caret cursor */
+    width: 0;
+    
+    /* 
+      1.5s typing animation running through 4 precise steps (one for each letter)
+      0.75s infinite blinking caret effect running simultaneously
+    */
+    animation: 
+      typeBizz 1.5s steps(4) infinite alternate,
+      blinkCaret 0.75s steps(1) infinite;
+  }
+}
+
+/* Keyframe to type out the absolute width of the string */
+@keyframes typeBizz {
+  from { width: 0; }
+  to { width: 5.5ch; } /* 'ch' perfectly scales horizontal length based on character count */
+}
+
+/* Keyframe to toggle the cursor opacity */
+@keyframes blinkCaret {
+  50% { border-color: transparent; }
+}
+
+@custom-variant dark {
+  &:is(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) {
+    @slot;
+
+    &::before,
+    &::after {
+      @slot;
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    &:not(
+        :is(
+          .dark,
+          .dark *,
+          [data-theme="dark"],
+          [data-theme="dark"] *,
+          [data-theme="light"],
+          [data-theme="light"] *
+        )
+      )
+      & {
+      @slot;
+
+      &::before,
+      &::after {
+        @slot;
+      }
+    }
+  }
+}
+
+@keyframes auth-float-y {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes auth-shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
