@@ -7,7 +7,7 @@ import { ThemeProvider } from './context/themecontext.jsx'
 import { WallpaperProvider } from './context/wallpaperContext.jsx'
 import ChatPage from './pages/ChatPage.jsx'
 import AuthPage from './pages/AuthPage.jsx'
-import AppLogo from './components/AppLogo.jsx'
+import AppLogo from './components/appLogo.jsx'
 import './index.css'
 
 function App() {
