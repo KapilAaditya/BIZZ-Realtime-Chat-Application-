@@ -10,23 +10,26 @@ import { MessageSquareIcon, UsersIcon } from "lucide-react";
 import { ConversationRow } from "./ConversationRow.jsx";
 
 function mapUserForList(user, onlineUsers) {
+  if (!user) return null;
+  const isOnline = Array.isArray(onlineUsers) && onlineUsers.includes(user._id);
+
   return {
     conversationId: user._id,
     id: user._id,
-    name: user.fullName,
+    name: user.fullName || "Unknown User",
     avatarUrl: user.profilePic,
-    initials: getInitials(user.fullName),
-    isOnline: onlineUsers.includes(user._id),
+    initials: getInitials(user.fullName || "User"),
+    isOnline,
     peer: {
-      name: user.fullName,
+      name: user.fullName || "Unknown User",
       avatarUrl: user.profilePic,
-      initials: getInitials(user.fullName),
-      isOnline: onlineUsers.includes(user._id),
+      initials: getInitials(user.fullName || "User"),
+      isOnline,
     },
   };
 }
 
-function ChatSidebar() {
+export function ChatSidebar() {
   const conversations = useChatStore((state) => state.conversations);
   const users = useChatStore((state) => state.users);
 
@@ -43,12 +46,17 @@ function ChatSidebar() {
 
   const normalizedSearchQuery = searchQuery.trim().toLowerCase();
 
-  const conversationUsers = conversations.map((user) => mapUserForList(user, onlineUsers));
-  const allUsers = users.map((user) => mapUserForList(user, onlineUsers));
+  const conversationUsers = conversations
+    .map((user) => mapUserForList(user, onlineUsers))
+    .filter(Boolean);
+
+  const allUsers = users
+    .map((user) => mapUserForList(user, onlineUsers))
+    .filter(Boolean);
 
   const filteredConversations = normalizedSearchQuery
     ? conversationUsers.filter((conversation) =>
-        conversation.peer.name.toLowerCase().includes(normalizedSearchQuery),
+        conversation.peer.name.toLowerCase().includes(normalizedSearchQuery)
       )
     : conversationUsers;
 
@@ -62,9 +70,9 @@ function ChatSidebar() {
         !isLargeScreen && activeConversationId ? "hidden lg:flex" : "flex"
       }`}
     >
+      {/* Sidebar Header */}
       <div className="shrink-0 border-b border-border px-2 pb-2 pt-2.5 sm:px-3 sm:pt-3">
         <div className="flex items-center justify-between gap-2 px-0.5 sm:gap-2.5 sm:px-1">
-          {/* FIXED: AppLogo renders both the icon and 'BIZZ' text natively */}
           <div className="flex-1 min-w-0">
             <AppLogo size="sm" animated={false} />
           </div>
@@ -79,6 +87,7 @@ function ChatSidebar() {
         </div>
       </div>
 
+      {/* Tabs & Search */}
       <Tabs
         selectedKey={sidebarTab}
         onSelectionChange={(key) => setSidebarTab(String(key))}
@@ -86,8 +95,10 @@ function ChatSidebar() {
         className="flex flex-1 flex-col overflow-y-auto"
       >
         <div className="shrink-0 border-b border-border px-3 pb-2 pt-2">
+          {/* Added aria-label to clear HeroUI accessibility warning */}
           <SearchField
             fullWidth
+            aria-label="Search users or conversations"
             variant="secondary"
             className="w-full"
             value={searchQuery}
@@ -95,7 +106,7 @@ function ChatSidebar() {
           >
             <SearchField.Group className="rounded-xl">
               <SearchField.SearchIcon />
-              <SearchField.Input placeholder="Search" />
+              <SearchField.Input placeholder="Search..." aria-label="Search conversations" />
               {searchQuery ? <SearchField.ClearButton /> : null}
             </SearchField.Group>
           </SearchField>
@@ -114,10 +125,8 @@ function ChatSidebar() {
           </Tabs.List>
         </Tabs.ListContainer>
 
-        <Tabs.Panel
-          id="chats"
-          className="flex-1 overflow-x-hidden overflow-y-auto outline-none"
-        >
+        {/* Chats Panel */}
+        <Tabs.Panel id="chats" className="flex-1 overflow-x-hidden overflow-y-auto outline-none">
           {filteredConversations.length === 0 ? (
             <p className="px-4 py-6 text-center text-sm text-muted">
               No conversations match your search.
@@ -134,6 +143,7 @@ function ChatSidebar() {
           )}
         </Tabs.Panel>
 
+        {/* Users Panel */}
         <Tabs.Panel id="users" className="flex-1 overflow-x-hidden overflow-y-auto outline-none">
           {filteredUsers.length === 0 ? (
             <p className="px-4 py-6 text-center text-sm text-muted">No people match your search.</p>
