@@ -1,46 +1,50 @@
-require('dotenv').config();
-const { Server } = require('socket.io');
-const express = require('express');
-const http = require('http');
+const { Server } = require("socket.io");
+const http = require("http");
+const express = require("express");
 
 const app = express();
 const server = http.createServer(app);
 
-const allowedOrigin = process.env.FRONTEND_URL || "http://localhost:5173";
+const userSocketMap = {}; // Maps { userId: socketId }
 
-const io = new Server(server, { 
-    cors: { origin: [allowedOrigin] } 
+const getReceiverSocketId = (receiverId) => {
+  return userSocketMap[receiverId];
+};
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  process.env.FRONTEND_URL,
+].filter(Boolean);
+
+const io = new Server(server, {
+  cors: {
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(null, false);
+      }
+    },
+    credentials: true,
+  },
 });
-
-// Lookup dictionary for online users
-const userSocketMap = {}; 
-
-// Helper function to find a specific user's socket ID (Fixed typo & brackets)
-function getReceiverSocketId(userId) {
-    return userSocketMap[userId]; 
-}
 
 io.on("connection", (socket) => {
-    const userId = socket.handshake.query.userId;
+  const userId = socket.handshake.query.userId;
+  if (userId && userId !== "undefined") {
+    userSocketMap[userId] = socket.id;
+  }
 
-    // 1. User connects: Save their socket ID (Fixed typo)
-    if (userId) userSocketMap[userId] = socket.id;
+  // Emit online users list
+  io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
-    // Broadcast the updated online users list to everyone
+  socket.on("disconnect", () => {
+    if (userId && userSocketMap[userId]) {
+      delete userSocketMap[userId];
+    }
     io.emit("getOnlineUsers", Object.keys(userSocketMap));
-    
-    // 2. User disconnects: Clean them up out of the dictionary
-    socket.on("disconnect", () => {
-        if (userId) delete userSocketMap[userId];
-        
-        // Broadcast the new list now that someone left
-        io.emit("getOnlineUsers", Object.keys(userSocketMap));
-    });
+  });
 });
 
-module.exports = {
-    io,
-    app,
-    server,
-    getReceiverSocketId
-};
+module.exports = { app, server, io, getReceiverSocketId };
