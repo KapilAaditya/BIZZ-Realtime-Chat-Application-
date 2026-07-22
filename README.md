@@ -1,7 +1,9 @@
 # 💬 BIZZ — Production-Grade Real-Time Chat Application
 
-An end-to-end, full-stack real-time messaging platform built completely from scratch using **React**, **Node.js**, and **Socket.io**. Features secure authentication,
-dynamic media sharing, live user presence, deep custom styling, and zero reliance on third-party backend services like Firebase or Supabase.
+ An end-to-end, full-stack real-time messaging platform built completely from scratch using **React**, **Node.js**, and **Socket.io**. Features secure authentication, dynamic media sharing, live user presence, deep custom styling, and zero reliance on third-party backend services like Firebase or Supabase.
+
+> 🚀 **Experience the Live Application:**  
+> **[👉 Launch BIZZ Chat App](https://bizz-realtime-chat-application-4.onrender.com/auth)**
 
 ---
 
@@ -39,9 +41,8 @@ dynamic media sharing, live user presence, deep custom styling, and zero relianc
 * **Media Optimization:** ImageKit
 
 ### Hosting & Infrastructure
-* **Frontend Hosting:** Render
-* **Backend Hosting:** Render
-* **Database Hosting:** MongoDB Atlas
+* **Live App:** Render (`https://bizz-realtime-chat-application-4.onrender.com`)
+* **Database:** MongoDB Atlas
 
 ---
 
@@ -51,8 +52,3 @@ dynamic media sharing, live user presence, deep custom styling, and zero relianc
 .
 ├── backend/            # Express server, Socket.io, routes & controllers
 └── frontend/           # React SPA with Zustand state management & Hero UI
-
-
-
-# CORS
-FRONTEND_URL=http://localhost:5173
